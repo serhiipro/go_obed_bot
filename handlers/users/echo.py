@@ -1,6 +1,5 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters import Command
 from states.poll_states import PollStates
 from copy import deepcopy
 from aiogram.utils.markdown import hlink
@@ -18,13 +17,13 @@ async def send_i_will_poll(message: types.Message, state: FSMContext):
 
 @dp.message_handler(text='/go_obed')
 async def send_i_will_poll(message: types.Message):
-    await bot.send_poll(message.chat.id, question='Го обед?', options=['го', 'не го'])
+    await bot.send_poll(message.chat.id, question='Го обед?', options=['го', 'не го'], is_anonymous=False)
 
 
 @dp.message_handler(text='/popular_poll')
 async def choose_place(message: types.Message):
     options = get_places_name_list(places_dict)
-    await bot.send_poll(message.chat.id, question='Куда?', options=options)
+    await bot.send_poll(message.chat.id, question='Куда?', options=options, is_anonymous=False)
 
 
 @dp.message_handler(text='/add_option')
@@ -46,13 +45,13 @@ async def add_option_to_poll(message: types.Message, state: FSMContext):
 async def add_link_for_option(message: types.Message, state: FSMContext):
     custom_option = await state.get_data()
     data = deepcopy(places_dict)
-    data['addditional_place'] = {'name': custom_option.get('custom_option'),
+    data['addditional_place'] = {'name': f"🍽 {custom_option.get('custom_option')} 🍽" ,
                                  'link': message.text if 'http' in message.text else ''}
     await state.reset_state()
     await state.update_data(data=data)
     data = await state.get_data()
     options = get_places_name_list(data)
-    await bot.send_poll(message.chat.id, question='Куда?', options=options)
+    await bot.send_poll(message.chat.id, question='Куда?', options=options, is_anonymous=False)
 
 
 def get_menus_list(data=None):

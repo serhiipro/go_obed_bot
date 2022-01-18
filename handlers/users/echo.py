@@ -3,30 +3,31 @@ from aiogram.dispatcher import FSMContext
 from states.poll_states import PollStates
 from copy import deepcopy
 from aiogram.utils.markdown import hlink
+from aiogram.dispatcher.filters.builtin import Command
 
 from loader import dp, bot
 from utils.misc.places import places_dict
 
 
-@dp.message_handler(text='/get_menus')
+@dp.message_handler(Command('get_menus'))
 async def send_i_will_poll(message: types.Message, state: FSMContext):
     data = await state.get_data()
     text = get_menus_list(data if data else places_dict)
     await message.answer('Ссылки на меню \n\n' + text)
 
 
-@dp.message_handler(text='/go_obed')
+@dp.message_handler(Command('go_obed'))
 async def send_i_will_poll(message: types.Message):
     await bot.send_poll(message.chat.id, question='Го обед?', options=['го', 'не го'], is_anonymous=False)
 
 
-@dp.message_handler(text='/popular_poll')
+@dp.message_handler(Command('popular_poll'))
 async def choose_place(message: types.Message):
     options = get_places_name_list(places_dict)
     await bot.send_poll(message.chat.id, question='Куда?', options=options, is_anonymous=False)
 
 
-@dp.message_handler(text='/add_option')
+@dp.message_handler(Command('add_option'))
 async def add_optionl(message: types.Message):
     await message.answer('Введите ваш вариант заведения')
     await PollStates.GetOptionState.set()
